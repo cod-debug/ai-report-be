@@ -65,8 +65,11 @@ class RawDataSeeder extends Seeder
                             'make_good_amt' => $row[30] ?? null,
                             'next_steps_reason_l2' => $row[31] ?? null
                         ];
-        
-                        RawDataModel::create($insert_data);
+                        
+                        if(RawDataModel::get()->count() === 0) {
+                            RawDataModel::create($insert_data);
+                        }
+                        
                     }
                 }
             }
