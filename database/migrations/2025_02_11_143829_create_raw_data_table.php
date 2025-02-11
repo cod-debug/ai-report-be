@@ -16,9 +16,9 @@ return new class extends Migration
             $table->string('manager');
             $table->string('supervisor');
             $table->string('agent');
-            $table->date('day_contact_date')->nullable();
-            $table->date('week_contact_date')->nullable();
-            $table->date('month_contact_date')->nullable();
+            $table->timestamp('day_contact_date')->nullable();
+            $table->timestamp('week_contact_date')->nullable();
+            $table->timestamp('month_contact_date')->nullable();
             $table->string('days_to_recontact')->nullable();
             $table->string('driver_level_1')->nullable();
             $table->string('driver_level_2')->nullable();

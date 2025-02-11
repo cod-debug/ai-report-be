@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\RawDataModel;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Log;
 use Maatwebsite\Excel\Facades\Excel;
@@ -27,15 +28,16 @@ class RawDataSeeder extends Seeder
                     if(!$row[0]){
                         break;
                     }
+
                     // start at index 1
                     if($key > 0){
                         $insert_data = [
                             'manager' => $row[0],
                             'supervisor' => $row[1],
                             'agent' => $row[2],
-                            'day_contact_date' => $row[3] ?? null,
-                            'week_contact_date' => $row[4] ?? null,
-                            'month_contact_date' => $row[5] ?? null,
+                            'day_contact_date' => substr($row[3], 0, 10),
+                            'week_contact_date' => substr($row[4], 0, 10),
+                            'month_contact_date' => substr($row[5], 0, 10),
                             'days_to_recontact' => $row[6] ?? null,
                             'driver_level_1' => $row[7] ?? null,
                             'driver_level_2' => $row[8] ?? null,
