@@ -66,10 +66,7 @@ class RawDataSeeder extends Seeder
                             'next_steps_reason_l2' => $row[31] ?? null
                         ];
                         
-                        if(RawDataModel::get()->count() === 0) {
-                            RawDataModel::create($insert_data);
-                        }
-                        
+                        RawDataModel::create($insert_data);
                     }
                 }
             }

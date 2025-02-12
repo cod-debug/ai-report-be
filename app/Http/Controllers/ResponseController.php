@@ -1,0 +1,62 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\RawDataModel;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+
+class ResponseController extends Controller
+{
+    //
+
+    public function generateResponse(Request $request){
+        try {
+            $validator = Validator::make($request->all(), [
+                'prompt' => 'required|min:3'
+            ]);
+
+            if ($validator->fails()) {
+                // Handle validation failure
+                return $this->validationError($validator->errors());
+            }
+
+            $prompt = $request->prompt;
+            
+            // conditions what function to call
+            if(strtolower($prompt) === 'generate the fcr for supervisor 1'){
+                $response = $this->generateFcrForSupervisor('Supervisor 1');
+                return response()->json($response);
+            }
+            
+            // if prompt given is not available in our app
+            return response()->json([
+                'message' => 'This prompt is out my scope for now. Try something else.'
+            ], 400);
+        } catch (\Exception $e){
+            return $this->serverError($e);
+        }
+    }
+
+    public function askAi(){
+        // request to open AI to ask something return json format only
+    }
+
+    private function generateFcrForSupervisor($supervisor){
+        try {
+            return RawDataModel::selectRaw("
+                COALESCE(SUM(recontacts_with_same_driver), 0) AS total_recontacts_with_same_driver,
+                COALESCE(SUM(recontacts), 0) AS total_recontacts,
+                100 - (COALESCE(SUM(recontacts_with_same_driver), 0) / NULLIF(COALESCE(SUM(recontacts), 0), 0) * 100) AS recontact_percentage
+            ")
+            ->where('supervisor', $supervisor)
+            ->first();
+
+            // ask ai here...
+
+            // return both response from system and from AI
+        } catch (\Exception $e) {
+            return $this->serverError($e);
+        }
+    }
+}
