@@ -25,8 +25,18 @@ class ResponseController extends Controller
             
             // conditions what function to call
             if(strtolower($prompt) === 'generate the fcr for supervisor 1'){
-                $response = $this->generateFcrForSupervisor('Supervisor 1');
-                return response()->json($response);
+                $raw_data = $this->generateFcrForSupervisor('Supervisor 1');
+
+                // ask a question ai base on the results of queried raw data
+                $prompt_to_ai = "Base on this data: ".$raw_data.", can you generate a summary for FCR of supervisor 1.";
+                $ai_response = $this->askAi($prompt_to_ai);
+
+
+
+                return response()->json([
+                    'raw_data' => $raw_data,
+                    'ai_response' => $ai_response,
+                ]);
             }
             
             // if prompt given is not available in our app
@@ -38,8 +48,9 @@ class ResponseController extends Controller
         }
     }
 
-    public function askAi(){
+    private function askAi($prompt){
         // request to open AI to ask something return json format only
+        
     }
 
     private function generateFcrForSupervisor($supervisor){
