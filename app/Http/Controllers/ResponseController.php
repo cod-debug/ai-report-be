@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\RawDataModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Gemini\Laravel\Facades\Gemini;
+use Parsedown;
 
 class ResponseController extends Controller
 {
@@ -31,9 +33,8 @@ class ResponseController extends Controller
                 $prompt_to_ai = "Base on this data: ".$raw_data.", can you generate a summary for FCR of supervisor 1.";
                 $ai_response = $this->askAi($prompt_to_ai);
 
-
-
                 return response()->json([
+                    'graph' => false,
                     'raw_data' => $raw_data,
                     'ai_response' => $ai_response,
                 ]);
@@ -49,8 +50,19 @@ class ResponseController extends Controller
     }
 
     private function askAi($prompt){
-        // request to open AI to ask something return json format only
-        
+        try {
+            $parsedown = new Parsedown();
+            $result = Gemini::geminiPro()->generateContent($prompt);
+            $text = $result->text();
+            $html_format = $parsedown->text($text);
+            
+            return [
+                'text' => $text,
+                'html_format' => $html_format,
+            ];
+        } catch (\Exception $e) {
+            return $this->serverError($e);
+        }
     }
 
     private function generateFcrForSupervisor($supervisor){
@@ -62,10 +74,6 @@ class ResponseController extends Controller
             ")
             ->where('supervisor', $supervisor)
             ->first();
-
-            // ask ai here...
-
-            // return both response from system and from AI
         } catch (\Exception $e) {
             return $this->serverError($e);
         }
