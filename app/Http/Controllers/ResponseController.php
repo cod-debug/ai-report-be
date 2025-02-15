@@ -49,6 +49,29 @@ class ResponseController extends Controller
         }
     }
 
+    public function additionalPrompt(Request $request){
+        try {
+            $validator = Validator::make($request->all(), [
+                'prompt' => 'required|min:3',
+                'raw_data' => 'required'
+            ]);
+
+            if ($validator->fails()) {
+                // Handle validation failure
+                return $this->validationError($validator->errors());
+            }
+
+            $prompt = "Based on this raw_data: ".$request->raw_data.", please answer this user's additional prompt: ".$request->prompt;
+            $ai_response = $this->askAi($prompt);
+
+            return response()->json([
+                'ai_response' => $ai_response,
+            ]);
+        } catch (\Exception $e) {
+            return $this->serverError($e);
+        }
+    }
+
     private function askAi($prompt){
         try {
             $parsedown = new Parsedown();

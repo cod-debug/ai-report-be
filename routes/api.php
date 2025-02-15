@@ -15,4 +15,5 @@ Route::prefix('auth')->group(function(){
 
 Route::prefix('prompt')->group(function(){
     Route::post('', [ResponseController::class, 'generateResponse']);
+    Route::post('additional', [ResponseController::class, 'additionalPrompt']);
 });
