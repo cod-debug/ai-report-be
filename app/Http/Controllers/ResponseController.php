@@ -30,7 +30,7 @@ class ResponseController extends Controller
                 $raw_data = $this->generateFcrForSupervisor('Supervisor 1');
 
                 // ask a question ai base on the results of queried raw data
-                $prompt_to_ai = "Base on this data: ".$raw_data.", can you generate a summary for FCR of supervisor 1.";
+                $prompt_to_ai = "Base on this data: ".$raw_data.", can you generate a summary for FCR of supervisor 1. FCR means first call resolution.";
                 $ai_response = $this->askAi($prompt_to_ai);
 
                 return response()->json([
@@ -39,13 +39,17 @@ class ResponseController extends Controller
                     'ai_response' => $ai_response,
                 ]);
             }
-            
+
             // conditions what function to call
             if(strtolower($prompt) === 'generate quarter view of aht in bar graph'){
-                $raw_data = $this->ahtQuarterView();
+                $raw_data = $this->ahtQuarterView()->collect()->map(function ($quarter) {
+                    $quarter->average_handling_time = number_format(($quarter->total_acw_duration_seconds + $quarter->total_hold_duration_minutes * 60  + $quarter->total_talk_duration_seconds) / $quarter->total_answered_calls / 60, 2);
+                    return $quarter;
+                });
 
+                // (ACW Duration (H)+(Hold Duration (H)*60)+Talk Duration (H) (s)) / # Answered (H)/60
                 // ask a question ai base on the results of queried raw data
-                $prompt_to_ai = "Base on this data: ".$raw_data.", can you generate a summary quarter view of AHT.";
+                $prompt_to_ai = "Base on this data: ".$raw_data.", can you generate a summary quarter view of AHT. AHT means average handling time";
                 $ai_response = $this->askAi($prompt_to_ai);
 
                 return response()->json([
@@ -116,7 +120,7 @@ class ResponseController extends Controller
             return $this->serverError($e);
         }
     }
-
+    
     private function ahtQuarterView(){
         try {
             return RawDataModel::selectRaw('YEAR(day_contact_date) as year, QUARTER(day_contact_date) as quarter')
