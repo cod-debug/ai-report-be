@@ -30,7 +30,7 @@ class ResponseController extends Controller
                 $raw_data = $this->generateFcrForSupervisor('Supervisor 1');
 
                 // ask a question ai base on the results of queried raw data
-                $prompt_to_ai = "Base on this data: ".$raw_data.", can you generate a summary for FCR of supervisor 1. FCR means first call resolution.";
+                $prompt_to_ai = "Base on this data: ".$raw_data.", can you generate a summary for FCR of supervisor 1.";
                 $ai_response = $this->askAi($prompt_to_ai);
 
                 return response()->json([
@@ -80,7 +80,7 @@ class ResponseController extends Controller
                 return $this->validationError($validator->errors());
             }
 
-            $prompt = "Based on this raw_data: ".$request->raw_data.", please answer this user's additional prompt: ".$request->prompt;
+            $prompt = "Based on this raw_data: ".json_encode($request->raw_data).", please answer this user's additional prompt: ".$request->prompt;
             $ai_response = $this->askAi($prompt);
 
             return response()->json([
@@ -112,6 +112,7 @@ class ResponseController extends Controller
             return RawDataModel::selectRaw("
                 COALESCE(SUM(recontacts_with_same_driver), 0) AS total_recontacts_with_same_driver,
                 COALESCE(SUM(recontacts), 0) AS total_recontacts,
+                COALESCE(SUM(answered), 0) AS total_answered_calls,
                 100 - (COALESCE(SUM(recontacts_with_same_driver), 0) / NULLIF(COALESCE(SUM(recontacts), 0), 0) * 100) AS recontact_percentage
             ")
             ->where('supervisor', $supervisor)
