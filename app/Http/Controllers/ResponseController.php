@@ -40,6 +40,21 @@ class ResponseController extends Controller
                 ]);
             }
             
+            // conditions what function to call
+            if(strtolower($prompt) === 'generate quarter view of aht in bar graph'){
+                $raw_data = $this->ahtQuarterView();
+
+                // ask a question ai base on the results of queried raw data
+                $prompt_to_ai = "Base on this data: ".$raw_data.", can you generate a summary quarter view of AHT.";
+                $ai_response = $this->askAi($prompt_to_ai);
+
+                return response()->json([
+                    'graph' => 'bar',
+                    'raw_data' => $raw_data,
+                    'ai_response' => $ai_response,
+                ]);
+            }
+            
             // if prompt given is not available in our app
             return response()->json([
                 'message' => 'This prompt is out my scope for now. Try something else.'
@@ -97,6 +112,21 @@ class ResponseController extends Controller
             ")
             ->where('supervisor', $supervisor)
             ->first();
+        } catch (\Exception $e) {
+            return $this->serverError($e);
+        }
+    }
+
+    private function ahtQuarterView(){
+        try {
+            return RawDataModel::selectRaw('YEAR(day_contact_date) as year, QUARTER(day_contact_date) as quarter')
+            ->selectRaw('SUM(acw_duration_seconds_handled) as total_acw_duration_seconds')
+            ->selectRaw('SUM(hold_duration_minutes_handled) as total_hold_duration_minutes')
+            ->selectRaw('SUM(talk_duration_seconds_handled) as total_talk_duration_seconds')
+            ->selectRaw('SUM(answered_handled) as total_answered_calls')
+            ->groupByRaw('YEAR(day_contact_date), QUARTER(day_contact_date)')
+            ->orderByRaw('YEAR(day_contact_date), QUARTER(day_contact_date)')
+            ->get();
         } catch (\Exception $e) {
             return $this->serverError($e);
         }
