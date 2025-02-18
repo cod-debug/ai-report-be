@@ -4,10 +4,10 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | OpenAI Configuration
+    | GEMINI Configuration
     |--------------------------------------------------------------------------
     |
-    | For configuring OpenAI related settings
+    | For configuring GEMINI related settings
     |
     */
     'api_key' => env('GEMINI_API_KEY')
