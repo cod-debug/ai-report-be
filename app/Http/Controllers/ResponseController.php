@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\RawDataModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Gemini\Laravel\Facades\Gemini;
+use GeminiAPI\Client;
+use GeminiAPI\Resources\Parts\TextPart;
 use Parsedown;
 
 class ResponseController extends Controller
@@ -94,7 +95,10 @@ class ResponseController extends Controller
     private function askAi($prompt){
         try {
             $parsedown = new Parsedown();
-            $result = Gemini::geminiPro()->generateContent($prompt);
+            $client = new Client(config('gemini.api_key'));
+            $result = $client->generativeModel(config('gemini.model'))->generateContent(
+                new TextPart($prompt)
+            );
             $text = $result->text();
             $html_format = $parsedown->text($text);
             
