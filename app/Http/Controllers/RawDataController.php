@@ -10,17 +10,19 @@ class RawDataController extends Controller
 {
     //
     public function sync(Request $request){
-        $apiKey = config('services.google.api_key');
-        $spreadsheetId = '1swilPRMD93TP5DI0YrxpXqpPzw8nvNZzYIkDeTpRHeQ';
+        $api_key = config('services.google.api_key');
+        $spreadsheet_id = '1swilPRMD93TP5DI0YrxpXqpPzw8nvNZzYIkDeTpRHeQ';
         $range = 'Raw Data';
         
-        $url = "https://sheets.googleapis.com/v4/spreadsheets/{$spreadsheetId}/values/{$range}?key={$apiKey}";
+        $url = "https://sheets.googleapis.com/v4/spreadsheets/{$spreadsheet_id}/values/{$range}?key={$api_key}";
         $response = Http::get($url);
 
         $data = $response->json()['values'];
         
         if (!empty($data)) {
+            // reset raw data table
             RawDataModel::truncate();
+
             foreach ($data as $key => $row) {
                 // stop when manager is null, meaning no further data
                 if(!$row[0]){
