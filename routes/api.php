@@ -1,4 +1,5 @@
 <?php
+use App\Http\Controllers\RawDataController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,4 +17,8 @@ Route::prefix('auth')->group(function(){
 Route::prefix('prompt')->group(function(){
     Route::post('', [ResponseController::class, 'generateResponse']);
     Route::post('additional', [ResponseController::class, 'additionalPrompt']);
+});
+
+Route::prefix('data')->group(function(){
+    Route::post('sync', [RawDataController::class, 'sync']);
 });
