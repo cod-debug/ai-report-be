@@ -130,9 +130,9 @@ class ResponseController extends Controller
         try {
             return RawDataModel::selectRaw("
                 COALESCE(SUM(recontacts_with_same_driver), 0) AS total_recontacts_with_same_driver,
-                COALESCE(SUM(recontacts_eligible), 0) AS total_recontacts,
+                COALESCE(SUM(recontacts_eligible), 0) AS total_recontacts_eligible,
                 COALESCE(SUM(answered), 0) AS total_answered_calls,
-                COALESCE(100 - (COALESCE(SUM(recontacts_with_same_driver), 0) / NULLIF(COALESCE(SUM(recontacts_eligible), 0), 0) * 100), 0) AS recontact_percentage
+                100 - (COALESCE(SUM(recontacts_with_same_driver), 0) / (COALESCE(SUM(recontacts_eligible), 0) * 100)) AS recontact_percentage
             ")
             ->where('supervisor', $supervisor)
             ->first();
