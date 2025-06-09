@@ -28,7 +28,7 @@ return new class extends Migration
             $table->string('rcr_driver_l2_match')->nullable();
             $table->integer('recontacts_with_same_driver')->nullable();
             $table->integer('recontacts')->nullable();
-            $table->integer('recontacts_eligible')->nullable();
+            $table->double('recontacts_eligible')->nullable();
             $table->double('acw_duration_seconds_handled')->nullable();
             $table->double('hold_duration_minutes_handled')->nullable();
             $table->double('talk_duration_seconds_handled')->nullable();

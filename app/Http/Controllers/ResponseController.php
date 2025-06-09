@@ -40,6 +40,21 @@ class ResponseController extends Controller
                     'ai_response' => $ai_response,
                 ]);
             }
+            
+            // conditions what function to call
+            if(strtolower($prompt) === 'generate the fcr for supervisor 2'){
+                $raw_data = $this->generateFcrForSupervisor('Supervisor 2');
+
+                // ask a question ai base on the results of queried raw data
+                $prompt_to_ai = "Base on this data: ".$raw_data.", can you generate a summary for FCR of supervisor 2.";
+                $ai_response = $this->askAi($prompt_to_ai);
+
+                return response()->json([
+                    'graph' => false,
+                    'raw_data' => $raw_data,
+                    'ai_response' => $ai_response,
+                ]);
+            }
 
             // conditions what function to call
             if(strtolower($prompt) === 'generate quarter view of aht in bar graph'){
@@ -117,7 +132,7 @@ class ResponseController extends Controller
                 COALESCE(SUM(recontacts_with_same_driver), 0) AS total_recontacts_with_same_driver,
                 COALESCE(SUM(recontacts_eligible), 0) AS total_recontacts,
                 COALESCE(SUM(answered), 0) AS total_answered_calls,
-                100 - (COALESCE(SUM(recontacts_with_same_driver), 0) / NULLIF(COALESCE(SUM(recontacts_eligible), 0), 0) * 100) AS recontact_percentage
+                COALESCE(100 - (COALESCE(SUM(recontacts_with_same_driver), 0) / NULLIF(COALESCE(SUM(recontacts_eligible), 0), 0) * 100), 0) AS recontact_percentage
             ")
             ->where('supervisor', $supervisor)
             ->first();
